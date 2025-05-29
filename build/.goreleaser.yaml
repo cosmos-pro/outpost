@@ -64,8 +64,8 @@ dockers:
     ids:
       - outpost
     image_templates:
-      - "hookdeck/outpost:latest-amd64"
-      - "hookdeck/outpost:{{ .Tag }}-amd64"
+      - "{{ .Env.ACR_LOGIN_SERVER }}/outpost:latest-amd64"
+      - "{{ .Env.ACR_LOGIN_SERVER }}/outpost:{{ .Tag }}-amd64"
     build_flag_templates:
       - "--pull"
       - "--label=org.opencontainers.image.created={{.Date}}"
@@ -81,8 +81,8 @@ dockers:
     ids:
       - outpost-arm64
     image_templates:
-      - "hookdeck/outpost:latest-arm64"
-      - "hookdeck/outpost:{{ .Tag }}-arm64"
+      - "{{ .Env.ACR_LOGIN_SERVER }}/outpost:latest-arm64"
+      - "{{ .Env.ACR_LOGIN_SERVER }}/outpost:{{ .Tag }}-arm64"
     build_flag_templates:
       - "--pull"
       - "--label=org.opencontainers.image.created={{.Date}}"
