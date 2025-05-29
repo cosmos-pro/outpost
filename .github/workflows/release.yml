@@ -11,9 +11,8 @@ jobs:
     env:
       # enable Buildx manifest support
       DOCKER_CLI_EXPERIMENTAL: "enabled"
-      # your ACR name, set this in Settings → Secrets → ACR_NAME
+      # still expose the secret if you need it elsewhere in run-scripts
       ACR_NAME: ${{ secrets.ACR_NAME }}
-      ACR_LOGIN_SERVER: ${{ env.ACR_NAME }}.azurecr.io
 
     steps:
       - name: Code checkout
@@ -21,7 +20,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: "20.x"
           registry-url: "https://registry.npmjs.org"
@@ -34,17 +34,16 @@ jobs:
         run: npm run build
         working-directory: internal/portal
 
-      # ─── Authenticate to Azure ───────────────────────────────────────────────
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # ─── Login to ACR ───────────────────────────────────────────────────────
       - name: ACR Login
         uses: azure/docker-login@v1
         with:
-          login-server: ${{ env.ACR_LOGIN_SERVER }}
+          # inline the computed login server here
+          login-server: ${{ secrets.ACR_NAME }}.azurecr.io
 
       - name: Set up Docker QEMU
         uses: docker/setup-qemu-action@v3
@@ -57,7 +56,6 @@ jobs:
         with:
           go-version: 1.23.0
 
-      # ─── Build & Push via GoReleaser ───────────────────────────────────────
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v4
         with:
@@ -65,5 +63,5 @@ jobs:
           args: release -f build/.goreleaser.yaml --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # pass the ACR login server into your GoReleaser config if needed
-          ACR_LOGIN_SERVER: ${{ env.ACR_LOGIN_SERVER }}
+          # GoReleaser will pick this up if your YAML references .Env.ACR_LOGIN_SERVER
+          ACR_LOGIN_SERVER: ${{ secrets.ACR_NAME }}.azurecr.io
