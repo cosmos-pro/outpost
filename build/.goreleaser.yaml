@@ -11,8 +11,8 @@ builds:
   - id: outpost
     ldflags:
       - -s -w
-      - -X github.com/hookdeck/outpost/internal/version.version={{.Version}}
-      - -X github.com/hookdeck/outpost/internal/version.commit={{.FullCommit}}
+      - -X github.com/cosmos-pro/outpost/internal/version.version={{.Version}}
+      - -X github.com/cosmos-pro/outpost/internal/version.commit={{.FullCommit}}
     binary: outpost
     env:
       - CGO_ENABLED=0
@@ -24,8 +24,8 @@ builds:
   - id: outpost-arm64
     ldflags:
       - -s -w
-      - -X github.com/hookdeck/outpost/internal/version.version={{.Version}}
-      - -X github.com/hookdeck/outpost/internal/version.commit={{.FullCommit}}
+      - -X github.com/cosmos-pro/outpost/internal/version.version={{.Version}}
+      - -X github.com/cosmos-pro/outpost/internal/version.commit={{.FullCommit}}
     binary: outpost
     env:
       - CGO_ENABLED=0
@@ -81,8 +81,8 @@ dockers:
     ids:
       - outpost-arm64
     image_templates:
-      - "{{ .Env.ACR_LOGIN_SERVER }}/outpost:latest-arm64"
-      - "{{ .Env.ACR_LOGIN_SERVER }}/outpost:{{ .Tag }}-arm64"
+      - "${{ secrets.ACR_NAME }}.azurecr.io/outpost:latest-arm64"
+      - "${{ secrets.ACR_NAME }}.azurecr.io/outpost:{{ .Tag }}-arm64"
     build_flag_templates:
       - "--pull"
       - "--label=org.opencontainers.image.created={{.Date}}"
@@ -95,9 +95,9 @@ dockers:
 docker_manifests:
   - name_template: "hookdeck/outpost:latest"
     image_templates:
-      - "hookdeck/outpost:latest-amd64"
-      - "hookdeck/outpost:latest-arm64"
-  - name_template: "hookdeck/outpost:{{ .Tag }}"
+      - "${{ secrets.ACR_NAME }}.azurecr.io/outpost:latest-amd64"
+      - "${{ secrets.ACR_NAME }}.azurecr.io/outpost:latest-arm64"
+  - name_template: "${{ secrets.ACR_NAME }}.azurecr.io/outpost:{{ .Tag }}"
     image_templates:
-      - "hookdeck/outpost:{{ .Tag }}-amd64"
-      - "hookdeck/outpost:{{ .Tag }}-arm64"
+      - "${{ secrets.ACR_NAME }}.azurecr.io/outpost:{{ .Tag }}-amd64"
+      - "${{ secrets.ACR_NAME }}.azurecr.io/outpost:{{ .Tag }}-arm64"
