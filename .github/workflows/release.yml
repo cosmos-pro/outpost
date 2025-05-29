@@ -9,36 +9,55 @@ jobs:
   release:
     runs-on: ubuntu-latest
     env:
-      # https://goreleaser.com/customization/docker_manifest/
+      # enable Buildx manifest support
       DOCKER_CLI_EXPERIMENTAL: "enabled"
+      # your ACR name, set this in Settings → Secrets → ACR_NAME
+      ACR_NAME: ${{ secrets.ACR_NAME }}
+      ACR_LOGIN_SERVER: ${{ env.ACR_NAME }}.azurecr.io
+
     steps:
       - name: Code checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - uses: actions/setup-node@v4
         with:
           node-version: "20.x"
           registry-url: "https://registry.npmjs.org"
+
       - name: Install JS dependencies
         run: npm install
         working-directory: internal/portal
+
       - name: Build Portal
         run: npm run build
         working-directory: internal/portal
-      - name: Docker Login
-        uses: docker/login-action@v3
+
+      # ─── Authenticate to Azure ───────────────────────────────────────────────
+      - name: Azure Login
+        uses: azure/login@v1
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # ─── Login to ACR ───────────────────────────────────────────────────────
+      - name: ACR Login
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ env.ACR_LOGIN_SERVER }}
+
       - name: Set up Docker QEMU
         uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version: 1.23.0
+
+      # ─── Build & Push via GoReleaser ───────────────────────────────────────
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v4
         with:
@@ -46,3 +65,5 @@ jobs:
           args: release -f build/.goreleaser.yaml --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # pass the ACR login server into your GoReleaser config if needed
+          ACR_LOGIN_SERVER: ${{ env.ACR_LOGIN_SERVER }}
