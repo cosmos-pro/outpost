@@ -81,8 +81,8 @@ dockers:
     ids:
       - outpost-arm64
     image_templates:
-      - "${{ secrets.ACR_NAME }}.azurecr.io/outpost:latest-arm64"
-      - "${{ secrets.ACR_NAME }}.azurecr.io/outpost:{{ .Tag }}-arm64"
+      - "cosmospro.azurecr.io/outpost:latest-arm64"
+      - "cosmospro.azurecr.io/outpost:{{ .Tag }}-arm64"
     build_flag_templates:
       - "--pull"
       - "--label=org.opencontainers.image.created={{.Date}}"
@@ -93,11 +93,11 @@ dockers:
       - "--label=homepage=https://hookdeck.com"
       - "--platform=linux/arm64/v8"
 docker_manifests:
-  - name_template: "hookdeck/outpost:latest"
+  - name_template: "cosmospro.azurecr.io/outpost:latest"
     image_templates:
-      - "${{ secrets.ACR_NAME }}.azurecr.io/outpost:latest-amd64"
-      - "${{ secrets.ACR_NAME }}.azurecr.io/outpost:latest-arm64"
-  - name_template: "${{ secrets.ACR_NAME }}.azurecr.io/outpost:{{ .Tag }}"
+      - "cosmospro.azurecr.io/outpost:latest-amd64"
+      - "cosmospro.azurecr.io/outpost:latest-arm64"
+  - name_template: "cosmospro.azurecr.io/outpost:{{ .Tag }}"
     image_templates:
-      - "${{ secrets.ACR_NAME }}.azurecr.io/outpost:{{ .Tag }}-amd64"
-      - "${{ secrets.ACR_NAME }}.azurecr.io/outpost:{{ .Tag }}-arm64"
+      - "cosmospro.azurecr.io/outpost:{{ .Tag }}-amd64"
+      - "cosmospro.azurecr.io/outpost:{{ .Tag }}-arm64"
